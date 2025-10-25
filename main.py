@@ -11,6 +11,9 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix, classification_report
+from sklearn.pipeline import Pipeline
+from sklearn.model_selection import GridSearchCV, StratifiedKFold
+from sklearn.svm import LinearSVC
 
 # =========================
 # 1. Carregar dataset
@@ -38,63 +41,104 @@ def clean_text(text):
 df["clean_text"] = df["pergunta"].apply(clean_text)
 
 # =========================
-# 3. Vetorização TF-IDF
+# 3. Vetorização e Pipeline com Grid Search
 # =========================
-vectorizer = TfidfVectorizer()
-X = vectorizer.fit_transform(df["clean_text"])
+# Usa Pipeline + GridSearchCV para otimizar TF-IDF e comparar Logistic Regression vs LinearSVC
+X_text = df["clean_text"]
 y = df["prioridade"]
 
-# =========================
-# 4. Divisão treino/teste
-# =========================
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, stratify=y, random_state=42
+X_train_text, X_test_text, y_train, y_test = train_test_split(
+    X_text, y, test_size=0.3, stratify=y, random_state=42
 )
 
-# =========================
-# 5. Treinar modelos
-# =========================
-models = {
-    "Naive Bayes": MultinomialNB(),
-    "Logistic Regression": LogisticRegression(max_iter=200, class_weight="balanced"),
-    "Random Forest": RandomForestClassifier(n_estimators=200, random_state=42, class_weight="balanced")
-}
+pipeline = Pipeline([
+    ("tfidf", TfidfVectorizer()),
+    ("clf", LogisticRegression(max_iter=500, class_weight="balanced"))
+])
 
-results = {}
+# Leaner param grid for faster convergence
+param_grid = [
+    {
+        "tfidf__ngram_range": [(1, 2), (1, 3)],
+        "tfidf__min_df": [1, 2],
+        "tfidf__max_df": [0.95],
+        "tfidf__strip_accents": ["unicode"],
+        "tfidf__sublinear_tf": [True],
+        "clf": [LogisticRegression(max_iter=500, class_weight="balanced")],
+        "clf__C": [0.5, 1, 2],
+        "clf__solver": ["liblinear", "saga"],
+    },
+    {
+        "tfidf__ngram_range": [(1, 2), (1, 3)],
+        "tfidf__min_df": [1, 2],
+        "tfidf__max_df": [0.95],
+        "tfidf__strip_accents": ["unicode"],
+        "tfidf__sublinear_tf": [True],
+        "clf": [LinearSVC(class_weight="balanced")],
+        "clf__C": [0.5, 1, 2],
+    },
+]
 
-for name, model in models.items():
-    model.fit(X_train, y_train)
-    preds = model.predict(X_test)
-    acc = accuracy_score(y_test, preds)
-    f1 = f1_score(y_test, preds, average="macro")
-    results[name] = {"accuracy": acc, "f1_macro": f1}
-    print(f"\n{name}")
-    print(classification_report(y_test, preds))
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+search = GridSearchCV(
+    pipeline,
+    param_grid=param_grid,
+    scoring="f1_macro",
+    n_jobs=-1,
+    cv=cv,
+    verbose=0,
+)
 
-# =========================
-# 6. Escolher melhor modelo
-# =========================
-best_model_name = max(results, key=lambda x: results[x]["f1_macro"])
-best_model = models[best_model_name]
-print(f"\n✅ Melhor modelo: {best_model_name}")
+# Função de regras para reforço de prioridade
+def apply_rules(clean_text_value, pred):
+    tokens = set(clean_text_value.split())
+    keywords_high = {
+        "erro","travado","trava","falha","bug","nao","não","funciona","abrir","abre","bloqueado",
+        "pix","catraca","pagamento","baixar","baixa","aplicativo","app","servidor","licenca","licença"
+    }
+    if tokens & keywords_high:
+        return 10
+    return pred
 
-# =========================
-# 7. Salvar modelo
-# =========================
-with open("models/best_model.pkl", "wb") as f:
-    pickle.dump((best_model, vectorizer), f)
+search.fit(X_train_text, y_train)
 
-print("💾 Modelo salvo em models/best_model.pkl")
+best_pipeline = search.best_estimator_
+best_clf_name = type(best_pipeline.named_steps["clf"]).__name__
+print(f"\n✅ Melhor pipeline: {best_clf_name} (GridSearchCV)")
+print(f"Melhores parâmetros: {search.best_params_}")
+
+# Avaliação no conjunto de teste
+# Aplica reforço de regras na predição do conjunto de teste
+y_pred_raw = best_pipeline.predict(X_test_text)
+y_pred = [apply_rules(text, p) for text, p in zip(X_test_text, y_pred_raw)]
+print("\nRelatório de classificação (teste):")
+print(classification_report(y_test, y_pred, zero_division=0))
 
 # =========================
 # 8. Função de predição
 # =========================
+# Atualiza para carregar o pipeline e aplicar diretamente
+
 def predict_priority(texto):
     with open("models/best_model.pkl", "rb") as f:
-        model, vec = pickle.load(f)
+        pipeline_loaded = pickle.load(f)
     clean = clean_text(texto)
-    X_new = vec.transform([clean])
-    return model.predict(X_new)[0]
+    pred = pipeline_loaded.predict([clean])[0]
+    return apply_rules(clean, pred)
+
+# =========================
+# 10. Matriz de confusão do melhor modelo
+# =========================
+cm = confusion_matrix(y_test, y_pred)
+
+plt.figure(figsize=(6,4))
+sns.heatmap(cm, annot=True, fmt="d", cmap="Blues",
+            xticklabels=sorted(y.unique()),
+            yticklabels=sorted(y.unique()))
+plt.xlabel("Previsto")
+plt.ylabel("Real")
+plt.title(f"Matriz de Confusão - {best_clf_name} (GridSearchCV)")
+plt.show()
 
 # =========================
 # 9. Testes manuais com gabarito
@@ -117,16 +161,9 @@ for texto, esperado in testes:
     print(f"➡ Esperado: {esperado} | 🔮 Previsto: {previsto}\n")
 
 # =========================
-# 10. Matriz de confusão do melhor modelo
+# 7. Salvar pipeline completo
 # =========================
-y_pred_best = best_model.predict(X_test)
-cm = confusion_matrix(y_test, y_pred_best)
+with open("models/best_model.pkl", "wb") as f:
+    pickle.dump(best_pipeline, f)
 
-plt.figure(figsize=(6,4))
-sns.heatmap(cm, annot=True, fmt="d", cmap="Blues",
-            xticklabels=sorted(y.unique()),
-            yticklabels=sorted(y.unique()))
-plt.xlabel("Previsto")
-plt.ylabel("Real")
-plt.title(f"Matriz de Confusão - {best_model_name}")
-plt.show()
+print("💾 Pipeline salvo em models/best_model.pkl")

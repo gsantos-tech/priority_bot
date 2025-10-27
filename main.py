@@ -5,6 +5,7 @@ import pickle
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
+import json
 from datetime import datetime
 
 from sklearn.model_selection import train_test_split
@@ -243,6 +244,9 @@ thresholds = [0.65, 0.70, 0.75]
 os.makedirs("reports", exist_ok=True)
 labels = sorted(y.unique())
 
+class_counts = df["prioridade"].value_counts().to_dict()
+summaries = []
+
 for t in thresholds:
     y_pred_t = [apply_rules(text, p, prob_10, t) for text, p, prob_10 in zip(X_test_text, y_pred_raw, prob_10_list)]
     report_dict_t = classification_report(y_test, y_pred_t, zero_division=0, output_dict=True)
@@ -256,6 +260,20 @@ for t in thresholds:
 
     pdf_path_t = os.path.join("reports", f"priority_bot_report_t{int(t*100)}.pdf")
     generate_pdf_report(acc_t, report_dict_t, cm_img_path_t, best_clf_name, search.best_params_, pdf_path_t, threshold=t)
+
+    macro_f1_t = report_dict_t.get('macro avg', {}).get('f1-score', None)
+    summaries.append({
+        "threshold": t,
+        "accuracy": acc_t,
+        "macro_f1": macro_f1_t,
+        "class_metrics": {
+            "1": report_dict_t.get("1", {}),
+            "5": report_dict_t.get("5", {}),
+            "10": report_dict_t.get("10", {})
+        },
+        "cm_path": os.path.basename(cm_img_path_t),
+        "pdf_path": os.path.basename(pdf_path_t)
+    })
 
 # =========================
 # 8. Função de predição
@@ -305,3 +323,17 @@ with open("models/best_model.pkl", "wb") as f:
     pickle.dump(best_pipeline, f)
 
 print("💾 Pipeline salvo em models/best_model.pkl")
+
+# =========================
+# 11. Salvar resumo em JSON para o frontend
+# =========================
+summary = {
+    "generated_at": datetime.now().isoformat(),
+    "dataset_counts": class_counts,
+    "best_model": best_clf_name,
+    "best_params": search.best_params_,
+    "threshold_summaries": summaries
+}
+with open(os.path.join("reports", "summary.json"), "w", encoding="utf-8") as f:
+    json.dump(summary, f, ensure_ascii=False, indent=2)
+print("📝 Summary salvo em reports/summary.json")

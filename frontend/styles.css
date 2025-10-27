@@ -1,0 +1,36 @@
+:root {
+  --bg: #0f172a;
+  --card: #111827;
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+  --accent: #22c55e;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); }
+header { padding: 24px; text-align: center; border-bottom: 1px solid #1f2937; }
+header h1 { margin: 0; font-size: 28px; }
+header p { margin: 8px 0 0; color: var(--muted); }
+main { max-width: 1100px; margin: 0 auto; padding: 24px; }
+section { margin-bottom: 28px; }
+section h2 { margin: 0 0 12px; font-size: 24px; }
+ul { margin: 0; padding-left: 18px; }
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.card { background: var(--card); border: 1px solid #1f2937; border-radius: 8px; padding: 14px; }
+.card h3 { margin: 0; font-size: 16px; color: var(--muted); }
+.card .value { font-size: 22px; margin-top: 6px; }
+.thresholds { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.threshold { background: var(--card); border: 1px solid #1f2937; border-radius: 8px; padding: 14px; }
+.threshold .head { display: flex; align-items: baseline; justify-content: space-between; }
+.threshold .head h3 { margin: 0; font-size: 18px; }
+.threshold .metrics { margin-top: 10px; font-size: 14px; color: var(--muted); }
+.matriz-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.matriz { background: var(--card); border: 1px solid #1f2937; border-radius: 8px; padding: 8px; }
+.matriz img { width: 100%; height: auto; border-radius: 6px; }
+.exemplo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.exemplo { background: var(--card); border: 1px solid #1f2937; border-radius: 8px; padding: 12px; }
+.conclusao p { color: var(--muted); }
+footer { text-align: center; padding: 16px; border-top: 1px solid #1f2937; color: var(--muted); }
+code { background: #0b1220; border: 1px solid #1b2434; padding: 2px 6px; border-radius: 6px; }
+@media (max-width: 900px) {
+  .cards, .thresholds, .matriz-grid, .exemplo-grid { grid-template-columns: 1fr; }
+}

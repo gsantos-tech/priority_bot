@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Priority Bot – Apresentação Didática</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <h1>Priority Bot</h1>
+    <p>Classificação de prioridade de chamados (1, 5, 10)</p>
+  </header>
+
+  <main>
+    <section class="intro">
+      <h2>Objetivo</h2>
+      <p>
+        Este sistema lê perguntas em português e classifica a prioridade do chamado em 1 (simples), 5 (informacional/procedimento) ou 10 (urgente).
+        Para garantir que urgências não sejam perdidas, usamos regras de falha explícitas (ex.: "erro", "tá travando", "não abre") e um limiar
+        de probabilidade calibrada que promove para 10 quando necessário.
+      </p>
+    </section>
+
+    <section class="dataset" id="dataset">
+      <h2>Dados</h2>
+      <div class="cards" id="datasetCards">
+        <!-- preenchido via JS -->
+      </div>
+    </section>
+
+    <section class="como-funciona">
+      <h2>Como funciona</h2>
+      <ul>
+        <li>Limpeza de texto: lowercase, remoção de pontuação, stopwords PT‑BR.</li>
+        <li>Representação: TF‑IDF de <strong>palavras</strong> + TF‑IDF de <strong>caracteres (3–5)</strong> para lidar com typos.</li>
+        <li>Classificador: <code>LogisticRegression</code> multinomial com <code>CalibratedClassifierCV</code>.</li>
+        <li>Regras: regex de falha explícita elevam para 10 (ex.: "não está funcionando", "tá travando", "não tá abrindo").</li>
+        <li>Limiar: promoção para 10 quando <code>P(10) ≥ limiar</code> (testamos 0.65, 0.70, 0.75).</li>
+      </ul>
+    </section>
+
+    <section class="resultados" id="resultados">
+      <h2>Resultados por limiar</h2>
+      <div class="thresholds" id="thresholds">
+        <!-- preenchido via JS -->
+      </div>
+    </section>
+
+    <section class="matrizes" id="matrizes">
+      <h2>Matrizes de Confusão</h2>
+      <div class="matriz-grid" id="matrizGrid">
+        <!-- preenchido via JS -->
+      </div>
+    </section>
+
+    <section class="exemplos">
+      <h2>Exemplos</h2>
+      <div class="exemplo-grid">
+        <div class="exemplo">
+          <h4>Urgência (10)</h4>
+          <p>"Não tá abrindo o app, fica tela preta" → <strong>10</strong></p>
+        </div>
+        <div class="exemplo">
+          <h4>Informacional (5)</h4>
+          <p>"Como configuro a impressora de recibos?" → <strong>5</strong></p>
+        </div>
+        <div class="exemplo">
+          <h4>Simples (1)</h4>
+          <p>"Quero emitir um relatório de despesas do mês passado" → <strong>1</strong></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="conclusao">
+      <h2>Conclusões</h2>
+      <p>
+        O desempenho é alto (accuracy ≈ 0.99; macro F1 ≈ 0.98) e a prioridade 10 recebe reforço por regras e calibração, reduzindo o risco de atrasos.
+        Para melhorar ainda mais, ampliamos o dataset com exemplos "difíceis" e recomendamos, futuramente, modelos PT avançados (ex.: BERTimbau).
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <small>Relatórios e matrizes disponíveis em <code>reports/</code>. Projeto MIT. Gabriel.</small>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

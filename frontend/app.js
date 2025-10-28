@@ -1,8 +1,9 @@
 async function loadSummary() {
   try {
-    const res = await fetch('../reports/summary.json');
+    // Cache-busting para evitar dados antigos no navegador
+    const res = await fetch(`../reports/summary.json?t=${Date.now()}`);
     const data = await res.json();
-    renderDataset(data.dataset_counts);
+    renderDataset(data.dataset_counts, data.data_path);
     renderThresholds(data.threshold_summaries);
     renderMatrizes(data.threshold_summaries);
     renderCharts(data.dataset_counts, data.threshold_summaries);
@@ -11,7 +12,7 @@ async function loadSummary() {
   }
 }
 
-function renderDataset(counts) {
+function renderDataset(counts, dataPath) {
   const container = document.getElementById('datasetCards');
   const total = Object.values(counts).reduce((a,b) => a+b, 0);
   const items = [
@@ -20,12 +21,19 @@ function renderDataset(counts) {
     { label: 'Classe 5', value: counts['5'] || 0 },
     { label: 'Classe 10', value: counts['10'] || 0 },
   ];
-  container.innerHTML = items.map(it => `
+  const cards = items.map(it => `
     <div class="card">
       <h3>${it.label}</h3>
       <div class="value">${it.value}</div>
     </div>
   `).join('');
+  const source = `
+    <div class="card">
+      <h3>Fonte de dados</h3>
+      <div class="value" style="font-size:14px;color:#9ca3af">${dataPath || 'desconhecida'}</div>
+    </div>
+  `;
+  container.innerHTML = source + cards;
 }
 
 function pct(x) { return (x*100).toFixed(1) + '%'; }

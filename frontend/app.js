@@ -5,6 +5,7 @@ async function loadSummary() {
     renderDataset(data.dataset_counts);
     renderThresholds(data.threshold_summaries);
     renderMatrizes(data.threshold_summaries);
+    renderCharts(data.dataset_counts, data.threshold_summaries);
   } catch (e) {
     console.error('Falha ao carregar summary.json', e);
   }
@@ -58,6 +59,66 @@ function renderMatrizes(ths) {
       <div style="margin-top:6px; color:#9ca3af; font-size:14px;">th=${t.threshold.toFixed(2)}</div>
     </div>
   `).join('');
+}
+
+function renderCharts(counts, ths) {
+  // Distribuição do Dataset (barras)
+  const dsCtx = document.getElementById('chartDataset').getContext('2d');
+  const dsLabels = ['Classe 1', 'Classe 5', 'Classe 10'];
+  const dsData = [counts['1']||0, counts['5']||0, counts['10']||0];
+  new Chart(dsCtx, {
+    type: 'bar',
+    data: {
+      labels: dsLabels,
+      datasets: [{
+        label: 'Exemplos',
+        data: dsData,
+        backgroundColor: ['#60a5fa','#f59e0b','#ef4444']
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+
+  // Macro F1 por limiar (barras)
+  const f1Ctx = document.getElementById('chartMacroF1').getContext('2d');
+  const thLabels = ths.map(t => t.threshold.toFixed(2));
+  const f1Data = ths.map(t => (t.macro_f1||0));
+  new Chart(f1Ctx, {
+    type: 'bar',
+    data: {
+      labels: thLabels,
+      datasets: [{
+        label: 'Macro F1',
+        data: f1Data,
+        backgroundColor: '#22c55e'
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, max: 1 } }
+    }
+  });
+
+  // Classe 10: Precisão vs Recall (linhas)
+  const c10Ctx = document.getElementById('chartC10').getContext('2d');
+  const c10Prec = ths.map(t => (t.class_metrics['10']?.precision||0));
+  const c10Rec = ths.map(t => (t.class_metrics['10']?.recall||0));
+  new Chart(c10Ctx, {
+    type: 'line',
+    data: {
+      labels: thLabels,
+      datasets: [
+        { label: 'Precisão (10)', data: c10Prec, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.25)' },
+        { label: 'Recall (10)', data: c10Rec, borderColor: '#f43f5e', backgroundColor: 'rgba(244,63,94,0.25)' }
+      ]
+    },
+    options: {
+      scales: { y: { beginAtZero: true, max: 1 } }
+    }
+  });
 }
 
 window.addEventListener('DOMContentLoaded', loadSummary);

@@ -50,6 +50,24 @@
       </div>
     </section>
 
+    <section class="graficos" id="graficos">
+      <h2>Gráficos Didáticos</h2>
+      <div class="charts">
+        <div class="chart-card">
+          <h3>Distribuição do Dataset</h3>
+          <canvas id="chartDataset" height="180"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Macro F1 por Limiar</h3>
+          <canvas id="chartMacroF1" height="180"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Classe 10: Precisão vs Recall</h3>
+          <canvas id="chartC10" height="180"></canvas>
+        </div>
+      </div>
+    </section>
+
     <section class="matrizes" id="matrizes">
       <h2>Matrizes de Confusão</h2>
       <div class="matriz-grid" id="matrizGrid">
@@ -87,7 +105,8 @@
   <footer>
     <small>Relatórios e matrizes disponíveis em <code>reports/</code>. Projeto MIT. Gabriel.</small>
   </footer>
-
+  <!-- Chart.js para gráficos didáticos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

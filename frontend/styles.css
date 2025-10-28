@@ -26,11 +26,14 @@ ul { margin: 0; padding-left: 18px; }
 .matriz-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .matriz { background: var(--card); border: 1px solid #1f2937; border-radius: 8px; padding: 8px; }
 .matriz img { width: 100%; height: auto; border-radius: 6px; }
+.charts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.chart-card { background: var(--card); border: 1px solid #1f2937; border-radius: 8px; padding: 14px; }
+.chart-card h3 { margin: 0 0 8px; font-size: 16px; color: var(--muted); }
 .exemplo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .exemplo { background: var(--card); border: 1px solid #1f2937; border-radius: 8px; padding: 12px; }
 .conclusao p { color: var(--muted); }
 footer { text-align: center; padding: 16px; border-top: 1px solid #1f2937; color: var(--muted); }
 code { background: #0b1220; border: 1px solid #1b2434; padding: 2px 6px; border-radius: 6px; }
 @media (max-width: 900px) {
-  .cards, .thresholds, .matriz-grid, .exemplo-grid { grid-template-columns: 1fr; }
+  .cards, .thresholds, .matriz-grid, .exemplo-grid, .charts { grid-template-columns: 1fr; }
 }

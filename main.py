@@ -26,7 +26,9 @@ from reportlab.lib.units import cm
 # =========================
 # 1. Carregar dataset
 # =========================
-df = pd.read_json("data/support_data_suporte_qna.json")
+# Permite configurar o caminho via variável de ambiente DATA_PATH
+DATA_PATH = os.getenv("DATA_PATH", "data/support_data_suporte_qna.json")
+df = pd.read_json(DATA_PATH)
 df = df[["pergunta", "prioridade"]]
 
 # =========================
@@ -232,6 +234,7 @@ best_pipeline = search.best_estimator_
 best_clf_name = type(best_pipeline.named_steps["clf"]).__name__
 print(f"\n✅ Melhor pipeline: {best_clf_name} (GridSearchCV)")
 print(f"Melhores parâmetros: {search.best_params_}")
+print(f"Dados usados: {DATA_PATH}")
 
 # Avaliação no conjunto de teste com varredura de limiar
 y_pred_raw = best_pipeline.predict(X_test_text)
@@ -329,6 +332,7 @@ print("💾 Pipeline salvo em models/best_model.pkl")
 # =========================
 summary = {
     "generated_at": datetime.now().isoformat(),
+    "data_path": DATA_PATH,
     "dataset_counts": class_counts,
     "best_model": best_clf_name,
     "best_params": search.best_params_,

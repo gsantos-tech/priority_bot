@@ -1,26 +1,27 @@
 {
-  "generated_at": "2025-10-27T20:09:13.182873",
+  "generated_at": "2025-10-27T20:55:58.080388",
+  "data_path": "data/support_data_subset.json",
   "dataset_counts": {
-    "5": 4163,
-    "10": 668,
-    "1": 368
+    "10": 334,
+    "1": 333,
+    "5": 333
   },
   "best_model": "CalibratedClassifierCV",
   "best_params": {
     "clf__cv": 3,
     "clf__estimator__C": 0.5,
     "clf__estimator__multi_class": "multinomial",
-    "clf__estimator__solver": "saga",
+    "clf__estimator__solver": "lbfgs",
     "clf__method": "sigmoid",
     "features__char__ngram_range": [
       3,
       5
     ],
     "features__word__max_df": 0.95,
-    "features__word__min_df": 1,
+    "features__word__min_df": 2,
     "features__word__ngram_range": [
       1,
-      3
+      2
     ],
     "features__word__strip_accents": "unicode",
     "features__word__sublinear_tf": true
@@ -28,26 +29,26 @@
   "threshold_summaries": [
     {
       "threshold": 0.65,
-      "accuracy": 0.9942307692307693,
-      "macro_f1": 0.9886000339381095,
+      "accuracy": 0.9866666666666667,
+      "macro_f1": 0.9866653331999866,
       "class_metrics": {
         "1": {
-          "precision": 1.0,
-          "recall": 0.9818181818181818,
-          "f1-score": 0.9908256880733946,
-          "support": 110.0
+          "precision": 0.9897959183673469,
+          "recall": 0.97,
+          "f1-score": 0.9797979797979798,
+          "support": 100.0
         },
         "5": {
-          "precision": 0.9975961538461539,
-          "recall": 0.9967974379503602,
-          "f1-score": 0.9971966359631558,
-          "support": 1249.0
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 100.0
         },
         "10": {
           "precision": 0.9705882352941176,
-          "recall": 0.9850746268656716,
-          "f1-score": 0.9777777777777777,
-          "support": 201.0
+          "recall": 0.99,
+          "f1-score": 0.9801980198019802,
+          "support": 100.0
         }
       },
       "cm_path": "confusion_matrix_t65.png",
@@ -55,26 +56,26 @@
     },
     {
       "threshold": 0.7,
-      "accuracy": 0.9942307692307693,
-      "macro_f1": 0.9886000339381095,
+      "accuracy": 0.9866666666666667,
+      "macro_f1": 0.9866653331999866,
       "class_metrics": {
         "1": {
-          "precision": 1.0,
-          "recall": 0.9818181818181818,
-          "f1-score": 0.9908256880733946,
-          "support": 110.0
+          "precision": 0.9897959183673469,
+          "recall": 0.97,
+          "f1-score": 0.9797979797979798,
+          "support": 100.0
         },
         "5": {
-          "precision": 0.9975961538461539,
-          "recall": 0.9967974379503602,
-          "f1-score": 0.9971966359631558,
-          "support": 1249.0
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 100.0
         },
         "10": {
           "precision": 0.9705882352941176,
-          "recall": 0.9850746268656716,
-          "f1-score": 0.9777777777777777,
-          "support": 201.0
+          "recall": 0.99,
+          "f1-score": 0.9801980198019802,
+          "support": 100.0
         }
       },
       "cm_path": "confusion_matrix_t70.png",
@@ -82,26 +83,26 @@
     },
     {
       "threshold": 0.75,
-      "accuracy": 0.9942307692307693,
-      "macro_f1": 0.9886000339381095,
+      "accuracy": 0.9866666666666667,
+      "macro_f1": 0.9866653331999866,
       "class_metrics": {
         "1": {
-          "precision": 1.0,
-          "recall": 0.9818181818181818,
-          "f1-score": 0.9908256880733946,
-          "support": 110.0
+          "precision": 0.9897959183673469,
+          "recall": 0.97,
+          "f1-score": 0.9797979797979798,
+          "support": 100.0
         },
         "5": {
-          "precision": 0.9975961538461539,
-          "recall": 0.9967974379503602,
-          "f1-score": 0.9971966359631558,
-          "support": 1249.0
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 100.0
         },
         "10": {
           "precision": 0.9705882352941176,
-          "recall": 0.9850746268656716,
-          "f1-score": 0.9777777777777777,
-          "support": 201.0
+          "recall": 0.99,
+          "f1-score": 0.9801980198019802,
+          "support": 100.0
         }
       },
       "cm_path": "confusion_matrix_t75.png",
